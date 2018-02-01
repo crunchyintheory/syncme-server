@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>Saved Videos List</title>
+        <style>
+            body{
+                margin:0;
+                font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;
+            }
+            body:not(.lite) {
+                padding: 30px;
+            }
+            h1{
+                margin:0;
+                font-size:48px;
+                font-weight:normal;
+                line-height:48px;
+            }
+            strong{
+                display:inline-block;
+                width:65px;
+            }
+            table {
+                width: 100%;
+                max-width: 1200px;
+            }
+            body:not(.lite) table {
+                margin-top: 30px;
+            }
+            body.lite td {
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            img {
+                height: 24px;
+                vertical-align: middle;
+                margin-top: -4px;
+                width: 24px;
+                margin-right: 2px;
+            }
+            td {
+                font-weight: 300;
+                height: 26px;
+            }
+            thead {
+                font-family: 'Muli Light';
+            }
+            th {
+                text-align: left;
+            }
+            .bottom {
+                position: absolute;
+                left: 5px;
+                bottom: 5px;
+                color: gray;
+            }
+            body.lite .bottom {
+                display: none !important;
+            }
+            form {
+                margin-bottom: inherit;
+            }
+        </style>
+    </head>
+    <body class="<?=$lite ? "lite" : "" ?>">
+        <?php
+            if(!$lite): ?>
+            <h1>Saved Videos</h1>
+        <?php
+            endif;
+        ?>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Saved From</th>
+                    <th>Date Saved</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <?php
+                        foreach($tabs as $tab): 
+                    ?>
+                        <tr>
+                            <td>
+                                <img src="<?=$tab->getIcon() ?>">
+                                <a href="<?=$tab->getURL() ?>" title="<?=$tab->getTitle() ?>" target="_blank"> <?=$tab->getTitle() ?> </a>
+                            </td>
+                            <td>
+                                <?=$tab->getHost() ?>
+                            </td>
+                            <td>
+                                <?=$tab->getDate() ?>
+                            </td>
+                            <td>
+                                <form action="/tabs/delete" method="POST">
+                                    <?php if ($lite): ?> <input type="hidden" name="lite" value="<?=$lite ?>"/> <?php endif; ?>
+                                    <input type="hidden" name="url" value="<?=$tab->getURLClean() ?>"/>
+                                    <input type="submit" name="delete" value="X"/>
+                                </form>
+                        </tr>
+                    <?php
+                        endforeach; 
+                    ?>
+            </tbody>
+        </table>
+        <a class="bottom" href="list/json">View JSON</a>
+    </body>
+</html>        

@@ -1,0 +1,4 @@
+vendor/*
+DBSetup.php
+app.log
+composer.phar
