@@ -33,7 +33,7 @@ $container['db'] = function ($c) {
 
 $container['view'] = new \Slim\Views\PhpRenderer('../templates');
 
-$app->get('/tabs/list[/{param}]', function (Request $request, Response $response, array $args) {
+$app->get('/list[/{param}]', function (Request $request, Response $response, array $args) {
     $mapper = new TabMapper($this->db);
     $tabs = $mapper->getTabs();
     
@@ -47,7 +47,7 @@ $app->get('/tabs/list[/{param}]', function (Request $request, Response $response
     return $response;
 });
 
-$app->post('/tabs/add', function (Request $request, Response $response) {
+$app->post('/add', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $tab_data = [];
 
@@ -66,7 +66,7 @@ $app->post('/tabs/add', function (Request $request, Response $response) {
     return $response;
 });
 
-$app->post('/tabs/delete', function (Request $request, Response $response) {
+$app->post('/delete', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
 
     $url = filter_var($data['url'], FILTER_SANITIZE_STRING);
