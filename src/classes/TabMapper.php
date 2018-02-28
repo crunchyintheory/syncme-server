@@ -3,7 +3,7 @@
 class TabMapper extends Mapper
 {
     public function getTabs() {
-        $sql = "SELECT * FROM tabs";
+        $sql = "SELECT * FROM tabs ORDER BY date ASC";
         $stmt = $this->db->query($sql);
 
         $results = [];
