@@ -97,6 +97,7 @@
                                 <form action="/tabs/delete" method="POST">
                                     <?php if ($lite): ?> <input type="hidden" name="lite" value="<?=$lite ?>"/> <?php endif; ?>
                                     <input type="hidden" name="url" value="<?=$tab->getURLClean() ?>"/>
+                                    <input type="hidden" name="key" value="<?=$key ?>"/>
                                     <input type="submit" name="delete" value="X"/>
                                 </form>
                         </tr>

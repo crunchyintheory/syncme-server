@@ -35,20 +35,37 @@ $container['view'] = new \Slim\Views\PhpRenderer('../templates');
 
 $app->get('/list[/{param}]', function (Request $request, Response $response, array $args) {
     $mapper = new TabMapper($this->db);
-    $tabs = $mapper->getTabs();
+    $key = $_GET['key'];
+    $user = $mapper->getUser($key);
     
-    $lite = false;
-    if(array_key_exists('param', $args)) {
-        $lite = $args['param'] == 'lite'; 
+    if($user !== false) {
+        $tabs = $mapper->getTabs($user);
+        
+        $lite = false;
+        if(array_key_exists('param', $args)) {
+            $lite = $args['param'] == 'lite'; 
+        }
+
+        $response = $this->view->render($response, 'tabs/list.phtml', ["tabs" => $tabs, "lite" => $lite, "key" => $key]);
+
+        return $response;
     }
-
-    $response = $this->view->render($response, 'tabs/list.phtml', ["tabs" => $tabs, "lite" => $lite]);
-
-    return $response;
+    else {
+        return $response->withStatus(401);
+    }
 });
 
 $app->post('/add', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
+    $mapper = new TabMapper($this->db);
+
+    $key = $data['key'];
+    $user = $mapper->getUser($key);
+    
+    if($user === false) {
+        return $response->withStatus(401);
+    }
+
     $tab_data = [];
 
     $tab_data['url'] = filter_var($data['url'], FILTER_SANITIZE_STRING);
@@ -57,10 +74,8 @@ $app->post('/add', function (Request $request, Response $response) {
     $tab_data['timestamp'] = filter_var($data['timestamp'], FILTER_SANITIZE_STRING);
     $tab_data['icon'] = filter_var($data['icon'], FILTER_SANITIZE_STRING);
     $tab_data['title'] = filter_var($data['title'], FILTER_SANITIZE_STRING);
-
     $tab = new TabEntity($tab_data, true);
-    $tab_mapper = new TabMapper($this->db);
-    $tab_mapper->save($tab);
+    $mapper->save($tab, $user);
 
     $response = $response->withStatus(201);
     return $response;
@@ -68,17 +83,26 @@ $app->post('/add', function (Request $request, Response $response) {
 
 $app->post('/delete', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
+    $mapper = new TabMapper($this->db);
+    
+    $key = $data['key'];
+    
+    $user = $mapper->getUser($key); 
 
+    if($user === false) {
+        return $response->withStatus(401);
+    }
+
+    
     $url = filter_var($data['url'], FILTER_SANITIZE_STRING);
-
-    $tab_mapper = new TabMapper($this->db);
-    $tab_mapper->deleteURL($url);
+    
+    $mapper->deleteURL($url, $user);
 
     if(array_key_exists('lite', $data) && $data['lite']) {
-        $response = $response->withRedirect('/tabs/list/lite');
+        $response = $response->withRedirect('/tabs/list/lite?key=' . $key);
     }
     else {
-        $response = $response->withRedirect('/tabs/list');
+        $response = $response->withRedirect('/tabs/list?key=' . $key);
     }
     return $response;
 });
